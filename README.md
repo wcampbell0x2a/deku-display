@@ -1,8 +1,8 @@
-# bintex
-[<img alt="github" src="https://img.shields.io/badge/github-wcampbell0x2a/bintex-8da0cb?style=for-the-badge&labelColor=555555&logo=github" height="20">](https://github.com/wcampbell0x2a/bintex)
-[<img alt="crates.io" src="https://img.shields.io/crates/v/bintex.svg?style=for-the-badge&color=fc8d62&logo=rust" height="20">](https://crates.io/crates/bintex)
-[<img alt="docs.rs" src="https://img.shields.io/badge/docs.rs-bintex-66c2a5?style=for-the-badge&labelColor=555555&logo=docs.rs" height="20">](https://docs.rs/bintex)
-[<img alt="build status" src="https://img.shields.io/github/actions/workflow/status/wcampbell0x2a/bintex/main.yml?branch=master&style=for-the-badge" height="20">](https://github.com/wcampbell0x2a/bintex/actions?query=branch%3Amaster)
+# deku-display
+[<img alt="github" src="https://img.shields.io/badge/github-wcampbell0x2a/deku--display-8da0cb?style=for-the-badge&labelColor=555555&logo=github" height="20">](https://github.com/wcampbell0x2a/deku-display)
+[<img alt="crates.io" src="https://img.shields.io/crates/v/deku-display.svg?style=for-the-badge&color=fc8d62&logo=rust" height="20">](https://crates.io/crates/deku-display)
+[<img alt="docs.rs" src="https://img.shields.io/badge/docs.rs-deku--display-66c2a5?style=for-the-badge&labelColor=555555&logo=docs.rs" height="20">](https://docs.rs/deku-display)
+[<img alt="build status" src="https://img.shields.io/github/actions/workflow/status/wcampbell0x2a/deku-display/main.yml?branch=master&style=for-the-badge" height="20">](https://github.com/wcampbell0x2a/deku-display/actions?query=branch%3Amaster)
 
 Create LaTeX [bytefield](https://www.ctan.org/pkg/bytefield) and reStructuredText [sphinxcontrib-bitfield](https://pypi.org/project/sphinxcontrib-bitfield/) diagrams with the
 use of rust proc-macros and the [deku](https://github.com/sharksforarms/deku) library.
@@ -10,18 +10,18 @@ use of rust proc-macros and the [deku](https://github.com/sharksforarms/deku) li
 # docs
 run `$ cargo doc --open`
 
-See `bintex::attribute` for Attribute details and examples.
+See `deku_display::attribute` for Attribute details and examples.
 
 # example
 
 Run `$ cargo run && pdflatex sample.tex` to create the following illustration from code:
 
 ```rust
-use bintex::{BinTex, BinTexOutput};
+use deku_display::{DekuDisplay, DekuDisplayOutput};
 use deku::prelude::*;
 
-#[derive(BinTex)]
-#[bintex(bit_width = 32)]
+#[derive(DekuDisplay)]
+#[deku_display(bit_width = 32)]
 struct Ipv6 {
     #[deku(bits = "4")]
     version: u8,

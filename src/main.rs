@@ -1,18 +1,18 @@
-use bintex::prelude::*;
+use deku_display::prelude::*;
 use deku::prelude::*;
 use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
-    #[derive(BinTex, DekuRead, DekuWrite)]
-    #[bintex(bit_width = 4)]
+    #[derive(DekuDisplay, DekuRead, DekuWrite)]
+    #[deku_display(bit_width = 4)]
     struct Version {
         #[deku(bits = "4")]
         version: u8,
     }
 
-    #[derive(BinTex, DekuRead, DekuWrite)]
-    #[bintex(bit_width = 32)]
+    #[derive(DekuDisplay, DekuRead, DekuWrite)]
+    #[deku_display(bit_width = 32)]
     struct Ipv6 {
         v: Version,
         #[deku(bits = "6")]

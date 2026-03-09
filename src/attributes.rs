@@ -1,36 +1,36 @@
 /*!
-A documentation-only module for #\[bintex\] attributes
+A documentation-only module for #\[deku_display\] attributes
 
-All attributes are able to be used from only bintex, but can be also used with #\[deku\].
+All attributes are able to be used from only deku_display, but can be also used with #\[deku\].
 
-For example, bintex only.
+For example, deku_display only.
 ```rust
-use bintex::prelude::*;
+use deku_display::prelude::*;
 
-#[derive(BinTex)]
-#[bintex(bit_width = "8", bitheader = "0, 7")]
+#[derive(DekuDisplay)]
+#[deku_display(bit_width = "8", bitheader = "0, 7")]
 struct Testing {
-    #[bintex(bits = "4")]
+    #[deku_display(bits = "4")]
     a: u8,
-    #[bintex(bits = "4")]
+    #[deku_display(bits = "4")]
     b: u8,
-    #[bintex(bits = "8")]
+    #[deku_display(bits = "8")]
     c: u8,
 }
 ```
 
-For example, both deku and bintex:
+For example, both deku and deku_display:
 ```rust
 use deku::prelude::*;
-use bintex::prelude::*;
+use deku_display::prelude::*;
 
-#[derive(BinTex, DekuRead, DekuWrite)]
-#[bintex(bit_width = "8", bitheader = "0, 7")]
+#[derive(DekuDisplay, DekuRead, DekuWrite)]
+#[deku_display(bit_width = "8", bitheader = "0, 7")]
 struct Testing {
     #[deku(bits = "4")]
     a: u8,
     #[deku(bits = "4")]
-    #[bintex(unused)]
+    #[deku_display(unused)]
     b: u8,
     #[deku(bits = "8")]
     c: u8,
@@ -39,12 +39,12 @@ struct Testing {
 
 # List of attributes
 
-|     Attribute           | Scope     |   Library   | Description
-|-------------------------|-----------|-------------|--------------------------------------------------
-| [bits](#bits)           | field     | deku/bintex | Set the bit-size of the field
-| [unused](#unused)       | field     | bintex      | Set background color to gray, supress field ident
-| [bit_width](#bit_width) | top-level | bintex      | Set width of bits in LaTeX bytefield
-| [bitheader](#bitheader) | top-level | bintex      | Set bitheader for LaTeX bytefield
+|     Attribute           | Scope     |   Library        | Description
+|-------------------------|-----------|------------------|--------------------------------------------------
+| [bits](#bits)           | field     | deku/deku_display | Set the bit-size of the field
+| [unused](#unused)       | field     | deku_display      | Set background color to gray, supress field ident
+| [bit_width](#bit_width) | top-level | deku_display      | Set width of bits in LaTeX bytefield
+| [bitheader](#bitheader) | top-level | deku_display      | Set bitheader for LaTeX bytefield
 
 # bits
 
@@ -57,14 +57,14 @@ Set background color to gray and remove the field name from the LaTeX output.
 Example:
 ```rust
 use deku::prelude::*;
-use bintex::prelude::*;
+use deku_display::prelude::*;
 
-#[derive(BinTex, DekuRead, DekuWrite)]
-#[bintex(bit_width = "32", bitheader = "0, 4, 8, 12, 16, 20, 24, 28")]
+#[derive(DekuDisplay, DekuRead, DekuWrite)]
+#[deku_display(bit_width = "32", bitheader = "0, 4, 8, 12, 16, 20, 24, 28")]
 struct UnusedStruct {
     Tag: u8,
     Value: u8,
-    #[bintex(unused)]
+    #[deku_display(unused)]
     #[deku(bits = "4")]
     c: u8,
     #[deku(bits = "12")]
@@ -73,7 +73,7 @@ struct UnusedStruct {
 }
 ```
 
-[example output](https://github.com/wcampbell0x2a/bintex/blob/master/media/unused.png)
+[example output](https://github.com/wcampbell0x2a/deku-display/blob/master/media/unused.png)
 
 # bit_width
 

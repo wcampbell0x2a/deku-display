@@ -1,19 +1,19 @@
 [package]
-name = "bintex"
+name = "deku-display"
 version = "0.1.0"
 edition = "2021"
 description = "Create bitfield LaTeX diagrams with the use of the deku library"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/wcampbell0x2a/bintex"
+repository = "https://github.com/wcampbell0x2a/deku-display"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [workspace]
 members = [
-    "bintex-derive"
+    "deku-display-derive"
 ]
 
 [dependencies]
 darling = "0.20.8"
-bintex_derive = { version = "^0.1.0", path = "bintex-derive"}
+deku_display_derive = { version = "^0.1.0", path = "deku-display-derive"}
 deku = "0.17.0"

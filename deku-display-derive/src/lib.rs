@@ -2,11 +2,11 @@ use darling::{ast, FromDeriveInput, FromField, FromMeta, FromVariant, ToTokens};
 use proc_macro2::TokenStream;
 use quote::quote;
 
-#[proc_macro_derive(BinTex, attributes(bintex, deku))]
-pub fn proc_bintex(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+#[proc_macro_derive(DekuDisplay, attributes(deku_display, deku))]
+pub fn proc_deku_display(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input: syn::DeriveInput = syn::parse_macro_input!(input);
 
-    let receiver = match BinTexReceiver::from_derive_input(&input) {
+    let receiver = match DekuDisplayReceiver::from_derive_input(&input) {
         Ok(receiver) => receiver,
         Err(err) => return err.write_errors().into(),
     };
@@ -15,13 +15,13 @@ pub fn proc_bintex(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
 }
 
 #[derive(Debug, FromDeriveInput)]
-#[darling(attributes(bintex), supports(struct_any, enum_any))]
+#[darling(attributes(deku_display), supports(struct_any, enum_any))]
 #[allow(unused)]
-struct BinTexReceiver {
+struct DekuDisplayReceiver {
     vis: syn::Visibility,
     ident: syn::Ident,
     generics: syn::Generics,
-    data: ast::Data<BinTexVariantReceiver, BinTexFieldReceiver>,
+    data: ast::Data<DekuDisplayVariantReceiver, DekuDisplayFieldReceiver>,
 
     bit_width: Num,
 
@@ -29,7 +29,7 @@ struct BinTexReceiver {
     bitheader: Option<syn::LitStr>,
 }
 
-impl BinTexReceiver {
+impl DekuDisplayReceiver {
     fn emit(&self) -> Result<TokenStream, syn::Error> {
         match self.data {
             darling::ast::Data::Enum(_) => unreachable!("currently unsupported"),
@@ -137,7 +137,7 @@ impl BinTexReceiver {
 
         let self_ident_string = ident.to_string();
         let tokens = quote! {
-        impl BinTexOutput for #ident {
+        impl DekuDisplayOutput for #ident {
             const BITS: usize = #bit_width as usize;
             fn latex_output() -> String {
                 #latex_preamble
@@ -182,16 +182,16 @@ impl BinTexReceiver {
 #[derive(Debug, FromVariant)]
 #[darling(attributes(deku))]
 #[allow(unused)]
-struct BinTexVariantReceiver {
+struct DekuDisplayVariantReceiver {
     ident: syn::Ident,
-    fields: ast::Fields<BinTexFieldReceiver>,
+    fields: ast::Fields<DekuDisplayFieldReceiver>,
     discriminant: Option<syn::Expr>,
 }
 
 /// Receiver for the field-level attributes inside a struct/enum variant
 #[derive(Debug, FromField)]
-#[darling(attributes(deku, bintex))]
-struct BinTexFieldReceiver {
+#[darling(attributes(deku, deku_display))]
+struct DekuDisplayFieldReceiver {
     ident: Option<syn::Ident>,
     ty: syn::Type,
 

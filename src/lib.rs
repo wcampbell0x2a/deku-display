@@ -3,16 +3,16 @@
 Create LaTeX [bytefield](https://www.ctan.org/pkg/bytefield) diagrams with the
 use of rust proc-macros and the [deku](https://github.com/sharksforarms/deku) library
 
-For documentation and examples on available `#[bintex]` attributes and features,
+For documentation and examples on available `#[deku_display]` attributes and features,
 see [attributes list](attributes)
 
 # Example
 
 ```rust
-    # use bintex::prelude::*;
+    # use deku_display::prelude::*;
     # use deku::prelude::*;
-    #[derive(BinTex, DekuRead, DekuWrite)]
-    #[bintex(bit_width = 32)]
+    #[derive(DekuDisplay, DekuRead, DekuWrite)]
+    #[deku_display(bit_width = 32)]
     struct Ipv6 {
         #[deku(bits = "4")]
         version: u8,
@@ -35,10 +35,10 @@ see [attributes list](attributes)
 pub mod attributes;
 pub mod prelude;
 
-pub use bintex_derive::*;
+pub use deku_display_derive::*;
 
 /// Generate latex output
-pub trait BinTexOutput {
+pub trait DekuDisplayOutput {
     /// For generated types, const of the `bit_width` attribute
     const BITS: usize;
     fn latex_output() -> String;

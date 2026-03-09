@@ -1,10 +1,10 @@
 #[test]
 fn all_bits() {
-    use bintex::prelude::*;
+    use deku_display::prelude::*;
 
     #[allow(dead_code)]
-    #[derive(BinTex)]
-    #[bintex(bit_width = "8")]
+    #[derive(DekuDisplay)]
+    #[deku_display(bit_width = "8")]
     struct Testing {
         #[deku(bits = "4")]
         a: u8,
@@ -27,11 +27,11 @@ fn all_bits() {
 
 #[test]
 fn use_bits_from_type() {
-    use bintex::prelude::*;
+    use deku_display::prelude::*;
 
     #[allow(dead_code)]
-    #[derive(BinTex)]
-    #[bintex(bit_width = "8")]
+    #[derive(DekuDisplay)]
+    #[deku_display(bit_width = "8")]
     struct Testing {
         #[deku(bits = "4")]
         a: u8,
@@ -53,11 +53,11 @@ fn use_bits_from_type() {
 
 #[test]
 fn readme() {
-    use bintex::prelude::*;
+    use deku_display::prelude::*;
 
     #[allow(dead_code)]
-    #[derive(BinTex)]
-    #[bintex(bit_width = 32)]
+    #[derive(DekuDisplay)]
+    #[deku_display(bit_width = 32)]
     struct Ipv6 {
         #[deku(bits = "4")]
         version: u8,
@@ -89,11 +89,11 @@ fn readme() {
 
 #[test]
 fn bitheader() {
-    use bintex::prelude::*;
+    use deku_display::prelude::*;
 
     #[allow(dead_code)]
-    #[derive(BinTex)]
-    #[bintex(bit_width = "8", bitheader = "0, 7")]
+    #[derive(DekuDisplay)]
+    #[deku_display(bit_width = "8", bitheader = "0, 7")]
     struct Testing {
         #[deku(bits = "4")]
         a: u8,
@@ -116,16 +116,16 @@ fn bitheader() {
 
 #[test]
 fn unused() {
-    use bintex::prelude::*;
+    use deku_display::prelude::*;
 
     #[allow(dead_code)]
-    #[derive(BinTex)]
-    #[bintex(bit_width = "8", bitheader = "0, 7")]
+    #[derive(DekuDisplay)]
+    #[deku_display(bit_width = "8", bitheader = "0, 7")]
     struct Testing {
         #[deku(bits = "4")]
         a: u8,
         #[deku(bits = "4")]
-        #[bintex(unused)]
+        #[deku_display(unused)]
         b: u8,
         #[deku(bits = "8")]
         c: u8,
@@ -144,21 +144,21 @@ fn unused() {
 
 #[test]
 fn other_struct() {
-    use bintex::prelude::*;
+    use deku_display::prelude::*;
 
     #[allow(dead_code)]
-    #[derive(BinTex)]
-    #[bintex(bit_width = 4)]
+    #[derive(DekuDisplay)]
+    #[deku_display(bit_width = 4)]
     struct Version {
         #[deku(bits = "4")]
         version: u8,
     }
 
     #[allow(dead_code)]
-    #[derive(BinTex)]
-    #[bintex(bit_width = 32)]
+    #[derive(DekuDisplay)]
+    #[deku_display(bit_width = 32)]
     struct Ipv6 {
-        #[bintex(bits = "4")]
+        #[deku_display(bits = "4")]
         v: Version,
         #[deku(bits = "6")]
         ds: u8,
@@ -198,11 +198,11 @@ fn other_struct() {
 
 #[test]
 fn rst_all_bits() {
-    use bintex::prelude::*;
+    use deku_display::prelude::*;
 
     #[allow(dead_code)]
-    #[derive(BinTex)]
-    #[bintex(bit_width = "8")]
+    #[derive(DekuDisplay)]
+    #[deku_display(bit_width = "8")]
     struct Testing {
         #[deku(bits = "4")]
         a: u8,
@@ -228,11 +228,11 @@ fn rst_all_bits() {
 
 #[test]
 fn rst_readme() {
-    use bintex::prelude::*;
+    use deku_display::prelude::*;
 
     #[allow(dead_code)]
-    #[derive(BinTex)]
-    #[bintex(bit_width = 32)]
+    #[derive(DekuDisplay)]
+    #[deku_display(bit_width = 32)]
     struct Ipv6 {
         #[deku(bits = "4")]
         version: u8,
@@ -271,16 +271,16 @@ fn rst_readme() {
 
 #[test]
 fn rst_unused() {
-    use bintex::prelude::*;
+    use deku_display::prelude::*;
 
     #[allow(dead_code)]
-    #[derive(BinTex)]
-    #[bintex(bit_width = "8")]
+    #[derive(DekuDisplay)]
+    #[deku_display(bit_width = "8")]
     struct Testing {
         #[deku(bits = "4")]
         a: u8,
         #[deku(bits = "4")]
-        #[bintex(unused)]
+        #[deku_display(unused)]
         b: u8,
         #[deku(bits = "8")]
         c: u8,
@@ -302,11 +302,11 @@ fn rst_unused() {
 
 #[test]
 fn rst_use_bits_from_type() {
-    use bintex::prelude::*;
+    use deku_display::prelude::*;
 
     #[allow(dead_code)]
-    #[derive(BinTex)]
-    #[bintex(bit_width = "8")]
+    #[derive(DekuDisplay)]
+    #[deku_display(bit_width = "8")]
     struct Testing {
         #[deku(bits = "4")]
         a: u8,

@@ -55,20 +55,26 @@ impl BinTexReceiver {
             format!("0-{}", bit_width - 1)
         };
 
-        // preamble
-        let preamble = quote! {
+        // LaTeX preamble
+        let latex_preamble = quote! {
                 let mut input = String::new();
                 input.push_str("\\begin{figure}\n");
                 input.push_str(&format!("\\begin{{bytefield}}{{{}}}\n", #bit_width));
                 input.push_str(&format!("\\bitheader{{{}}} \\\\\n", #bitheader));
         };
 
-        // body
-        let mut body = quote! {let mut total_bits: u8 = 0;};
+        // LaTeX body
+        let mut latex_body = quote! {let mut total_bits: u8 = 0;};
+
+        // RST body
+        let mut rst_body = quote! {
+            let mut total_bits: usize = 0;
+            let mut entries: Vec<String> = Vec::new();
+        };
 
         for field in fields {
             // create unused and ident (&str, String)
-            let (unused, ident) = if field.unused.is_some() {
+            let (unused, latex_ident) = if field.unused.is_some() {
                 ("[bgcolor=lightgray]", "".to_string())
             } else {
                 (
@@ -82,6 +88,12 @@ impl BinTexReceiver {
                 )
             };
 
+            let rst_ident: Option<String> = if field.unused.is_some() {
+                None
+            } else {
+                Some(field.ident.as_ref().unwrap().to_string())
+            };
+
             let field_ty = &field.ty;
             let token_bits = if let Some(ref bits) = field.bits {
                 if let Ok(bits) = bits.0.base10_parse::<u8>() {
@@ -92,10 +104,11 @@ impl BinTexReceiver {
             } else {
                 quote! { #field_ty::BITS }
             };
-            body = quote! {
-                #body
 
-                input.push_str(&format!("\\bitbox{{{}}}{}{{{}}}", #token_bits, #unused, #ident));
+            latex_body = quote! {
+                #latex_body
+
+                input.push_str(&format!("\\bitbox{{{}}}{}{{{}}}", #token_bits, #unused, #latex_ident));
 
                 total_bits += #token_bits as u8;
                 if (total_bits % #bit_width) == 0 {
@@ -104,6 +117,22 @@ impl BinTexReceiver {
                     input.push_str(" & ");
                 }
             };
+
+            let rst_entry = if let Some(name) = rst_ident {
+                quote! {
+                    entries.push(format!("{{ \"name\": \"{}\", \"bits\": {} }}", #name, #token_bits));
+                    total_bits += #token_bits as usize;
+                }
+            } else {
+                quote! {
+                    entries.push(format!("{{ \"bits\": {} }}", #token_bits));
+                    total_bits += #token_bits as usize;
+                }
+            };
+            rst_body = quote! {
+                #rst_body
+                #rst_entry
+            };
         }
 
         let self_ident_string = ident.to_string();
@@ -111,14 +140,38 @@ impl BinTexReceiver {
         impl BinTexOutput for #ident {
             const BITS: usize = #bit_width as usize;
             fn latex_output() -> String {
-                #preamble
+                #latex_preamble
 
-                #body
+                #latex_body
 
                 input.push_str("\\end{bytefield}\n");
                 input.push_str(&format!("\\caption{{{}}}\n", #self_ident_string));
                 input.push_str("\\end{figure}");
                 input
+            }
+
+            fn rst_bitfield_output() -> String {
+                #rst_body
+
+                let bit_width: usize = #bit_width as usize;
+                let lanes = (total_bits + bit_width - 1) / bit_width;
+
+                let mut output = String::new();
+                output.push_str(".. bitfield::\n");
+                output.push_str(&format!("    :bits: {}\n", total_bits));
+                output.push_str(&format!("    :lanes: {}\n", lanes));
+                output.push_str("    :hflip:\n");
+                output.push_str("    :vflip:\n");
+                output.push_str("\n    [\n");
+                for (i, entry) in entries.iter().enumerate() {
+                    if i < entries.len() - 1 {
+                        output.push_str(&format!("        {},\n", entry));
+                    } else {
+                        output.push_str(&format!("        {}\n", entry));
+                    }
+                }
+                output.push_str("    ]");
+                output
             }
         }};
 

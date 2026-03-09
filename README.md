@@ -4,7 +4,7 @@
 [<img alt="docs.rs" src="https://img.shields.io/badge/docs.rs-bintex-66c2a5?style=for-the-badge&labelColor=555555&logo=docs.rs" height="20">](https://docs.rs/bintex)
 [<img alt="build status" src="https://img.shields.io/github/actions/workflow/status/wcampbell0x2a/bintex/main.yml?branch=master&style=for-the-badge" height="20">](https://github.com/wcampbell0x2a/bintex/actions?query=branch%3Amaster)
 
-Create LaTeX [bytefield](https://www.ctan.org/pkg/bytefield) diagrams with the
+Create LaTeX [bytefield](https://www.ctan.org/pkg/bytefield) and reStructuredText [sphinxcontrib-bitfield](https://pypi.org/project/sphinxcontrib-bitfield/) diagrams with the
 use of rust proc-macros and the [deku](https://github.com/sharksforarms/deku) library.
 
 # docs

@@ -42,4 +42,5 @@ pub trait BinTexOutput {
     /// For generated types, const of the `bit_width` attribute
     const BITS: usize;
     fn latex_output() -> String;
+    fn rst_bitfield_output() -> String;
 }

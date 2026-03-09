@@ -31,4 +31,11 @@ fn main() {
     let mut file = File::create("TestingBytefield.tex").unwrap();
     file.write_all(Version::latex_output().as_bytes()).unwrap();
     file.write_all(Ipv6::latex_output().as_bytes()).unwrap();
+
+    // Note: Version has bit_width=4 which sphinxcontrib-bitfield rejects (minimum 5)
+    let mut rst_file = File::create("TestingBytefield.rst").unwrap();
+    rst_file.write_all(b"Bitfields\n=========\n\n").unwrap();
+    rst_file
+        .write_all(Ipv6::rst_bitfield_output().as_bytes())
+        .unwrap();
 }

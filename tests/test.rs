@@ -195,3 +195,136 @@ fn other_struct() {
     file.push_str(&Ipv6::latex_output());
     assert_eq!(expected, expected);
 }
+
+#[test]
+fn rst_all_bits() {
+    use bintex::prelude::*;
+
+    #[allow(dead_code)]
+    #[derive(BinTex)]
+    #[bintex(bit_width = "8")]
+    struct Testing {
+        #[deku(bits = "4")]
+        a: u8,
+        #[deku(bits = "4")]
+        b: u8,
+        #[deku(bits = "8")]
+        c: u8,
+    }
+
+    let expected = r#".. bitfield::
+    :bits: 16
+    :lanes: 2
+    :hflip:
+    :vflip:
+
+    [
+        { "name": "a", "bits": 4 },
+        { "name": "b", "bits": 4 },
+        { "name": "c", "bits": 8 }
+    ]"#;
+    assert_eq!(Testing::rst_bitfield_output(), expected);
+}
+
+#[test]
+fn rst_readme() {
+    use bintex::prelude::*;
+
+    #[allow(dead_code)]
+    #[derive(BinTex)]
+    #[bintex(bit_width = 32)]
+    struct Ipv6 {
+        #[deku(bits = "4")]
+        version: u8,
+        #[deku(bits = "6")]
+        ds: u8,
+        #[deku(bits = "2")]
+        ecn: u8,
+        #[deku(bits = "20")]
+        label: u32,
+        length: u16,
+        next_header: u8,
+        hop_limit: u8,
+        src: u32,
+        dst: u32,
+    }
+
+    let expected = r#".. bitfield::
+    :bits: 128
+    :lanes: 4
+    :hflip:
+    :vflip:
+
+    [
+        { "name": "version", "bits": 4 },
+        { "name": "ds", "bits": 6 },
+        { "name": "ecn", "bits": 2 },
+        { "name": "label", "bits": 20 },
+        { "name": "length", "bits": 16 },
+        { "name": "next_header", "bits": 8 },
+        { "name": "hop_limit", "bits": 8 },
+        { "name": "src", "bits": 32 },
+        { "name": "dst", "bits": 32 }
+    ]"#;
+    assert_eq!(Ipv6::rst_bitfield_output(), expected);
+}
+
+#[test]
+fn rst_unused() {
+    use bintex::prelude::*;
+
+    #[allow(dead_code)]
+    #[derive(BinTex)]
+    #[bintex(bit_width = "8")]
+    struct Testing {
+        #[deku(bits = "4")]
+        a: u8,
+        #[deku(bits = "4")]
+        #[bintex(unused)]
+        b: u8,
+        #[deku(bits = "8")]
+        c: u8,
+    }
+
+    let expected = r#".. bitfield::
+    :bits: 16
+    :lanes: 2
+    :hflip:
+    :vflip:
+
+    [
+        { "name": "a", "bits": 4 },
+        { "bits": 4 },
+        { "name": "c", "bits": 8 }
+    ]"#;
+    assert_eq!(Testing::rst_bitfield_output(), expected);
+}
+
+#[test]
+fn rst_use_bits_from_type() {
+    use bintex::prelude::*;
+
+    #[allow(dead_code)]
+    #[derive(BinTex)]
+    #[bintex(bit_width = "8")]
+    struct Testing {
+        #[deku(bits = "4")]
+        a: u8,
+        #[deku(bits = "4")]
+        b: u8,
+        c: u8,
+    }
+
+    let expected = r#".. bitfield::
+    :bits: 16
+    :lanes: 2
+    :hflip:
+    :vflip:
+
+    [
+        { "name": "a", "bits": 4 },
+        { "name": "b", "bits": 4 },
+        { "name": "c", "bits": 8 }
+    ]"#;
+    assert_eq!(Testing::rst_bitfield_output(), expected);
+}

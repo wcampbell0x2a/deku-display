@@ -1,0 +1,19 @@
+---
+source: deku-display-cli/tests/snapshots.rs
+expression: "generate_all(source, \"latex\")"
+snapshot_kind: text
+---
+\begin{figure}
+\begin{bytefield}{8}
+\bitheader{0-7} \\
+\bitbox{4}{version} & \bitbox{4}{flags} \\
+\end{bytefield}
+\caption{Packet::Header}
+\end{figure}
+\begin{figure}
+\begin{bytefield}{8}
+\bitheader{0-7} \\
+\bitbox{8}{payload} \\
+\end{bytefield}
+\caption{Packet::Data}
+\end{figure}

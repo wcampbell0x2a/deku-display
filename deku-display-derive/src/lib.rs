@@ -32,7 +32,7 @@ struct DekuDisplayReceiver {
 impl DekuDisplayReceiver {
     fn emit(&self) -> Result<TokenStream, syn::Error> {
         match self.data {
-            darling::ast::Data::Enum(_) => unreachable!("currently unsupported"),
+            darling::ast::Data::Enum(_) => self.emit_enum(),
             darling::ast::Data::Struct(_) => self.emit_struct(),
         }
     }
@@ -174,6 +174,177 @@ impl DekuDisplayReceiver {
                 output
             }
         }};
+
+        Ok(tokens)
+    }
+
+    fn emit_enum(&self) -> Result<TokenStream, syn::Error> {
+        let (_, ty, _) = self.generics.split_for_impl();
+
+        let ident = &self.ident;
+        let ident = quote! { #ident #ty };
+
+        let variants = self.data.as_ref().take_enum().unwrap();
+
+        let bit_width = self.bit_width.0.base10_parse::<u8>()?;
+
+        let bitheader = if let Some(bitheader) = self.bitheader.as_ref() {
+            bitheader.value()
+        } else {
+            format!("0-{}", bit_width - 1)
+        };
+
+        let enum_name = self.ident.to_string();
+
+        let mut latex_variant_parts = Vec::new();
+        let mut rst_variant_parts = Vec::new();
+
+        for variant in variants {
+            let named_fields: Vec<_> = variant
+                .fields
+                .iter()
+                .filter(|f| f.ident.is_some())
+                .collect();
+
+            if named_fields.is_empty() {
+                continue;
+            }
+
+            let variant_name = variant.ident.to_string();
+            let caption = format!("{}::{}", enum_name, variant_name);
+
+            // LaTeX for this variant
+            let mut latex_body = quote! { let mut total_bits: u8 = 0; };
+            for field in &named_fields {
+                let (unused, latex_ident) = if field.unused.is_some() {
+                    ("[bgcolor=lightgray]", "".to_string())
+                } else {
+                    (
+                        "",
+                        field.ident.as_ref().unwrap().to_string().replace('_', "\\_"),
+                    )
+                };
+
+                let field_ty = &field.ty;
+                let token_bits = if let Some(ref bits) = field.bits {
+                    if let Ok(bits) = bits.0.base10_parse::<u8>() {
+                        quote! { #bits }
+                    } else {
+                        unreachable!()
+                    }
+                } else {
+                    quote! { #field_ty::BITS }
+                };
+
+                latex_body = quote! {
+                    #latex_body
+                    input.push_str(&format!("\\bitbox{{{}}}{}{{{}}}", #token_bits, #unused, #latex_ident));
+                    total_bits += #token_bits as u8;
+                    if (total_bits % #bit_width) == 0 {
+                        input.push_str(" \\\\\n");
+                    } else {
+                        input.push_str(" & ");
+                    }
+                };
+            }
+
+            let latex_caption = caption.clone();
+            let latex_part = quote! {
+                {
+                    let mut input = String::new();
+                    input.push_str("\\begin{figure}\n");
+                    input.push_str(&format!("\\begin{{bytefield}}{{{}}}\n", #bit_width));
+                    input.push_str(&format!("\\bitheader{{{}}} \\\\\n", #bitheader));
+                    #latex_body
+                    input.push_str("\\end{bytefield}\n");
+                    input.push_str(&format!("\\caption{{{}}}\n", #latex_caption));
+                    input.push_str("\\end{figure}");
+                    input
+                }
+            };
+            latex_variant_parts.push(latex_part);
+
+            // RST for this variant
+            let mut rst_body = quote! {
+                let mut total_bits: usize = 0;
+                let mut entries: Vec<String> = Vec::new();
+            };
+
+            for field in &named_fields {
+                let rst_ident: Option<String> = if field.unused.is_some() {
+                    None
+                } else {
+                    Some(field.ident.as_ref().unwrap().to_string())
+                };
+
+                let field_ty = &field.ty;
+                let token_bits = if let Some(ref bits) = field.bits {
+                    if let Ok(bits) = bits.0.base10_parse::<u8>() {
+                        quote! { #bits }
+                    } else {
+                        unreachable!()
+                    }
+                } else {
+                    quote! { #field_ty::BITS }
+                };
+
+                let rst_entry = if let Some(name) = rst_ident {
+                    quote! {
+                        entries.push(format!("{{ \"name\": \"{}\", \"bits\": {} }}", #name, #token_bits));
+                        total_bits += #token_bits as usize;
+                    }
+                } else {
+                    quote! {
+                        entries.push(format!("{{ \"bits\": {} }}", #token_bits));
+                        total_bits += #token_bits as usize;
+                    }
+                };
+                rst_body = quote! {
+                    #rst_body
+                    #rst_entry
+                };
+            }
+
+            let rst_part = quote! {
+                {
+                    #rst_body
+                    let bit_width: usize = #bit_width as usize;
+                    let lanes = (total_bits + bit_width - 1) / bit_width;
+                    let mut output = String::new();
+                    output.push_str(".. bitfield::\n");
+                    output.push_str(&format!("    :bits: {}\n", total_bits));
+                    output.push_str(&format!("    :lanes: {}\n", lanes));
+                    output.push_str("    :hflip:\n");
+                    output.push_str("    :vflip:\n");
+                    output.push_str("\n    [\n");
+                    for (i, entry) in entries.iter().enumerate() {
+                        if i < entries.len() - 1 {
+                            output.push_str(&format!("        {},\n", entry));
+                        } else {
+                            output.push_str(&format!("        {}\n", entry));
+                        }
+                    }
+                    output.push_str("    ]");
+                    output
+                }
+            };
+            rst_variant_parts.push(rst_part);
+        }
+
+        let tokens = quote! {
+            impl DekuDisplayOutput for #ident {
+                const BITS: usize = #bit_width as usize;
+                fn latex_output() -> String {
+                    let parts: Vec<String> = vec![#(#latex_variant_parts),*];
+                    parts.join("\n")
+                }
+
+                fn rst_bitfield_output() -> String {
+                    let parts: Vec<String> = vec![#(#rst_variant_parts),*];
+                    parts.join("\n\n")
+                }
+            }
+        };
 
         Ok(tokens)
     }

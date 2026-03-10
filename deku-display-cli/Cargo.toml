@@ -1,0 +1,14 @@
+[package]
+name = "deku-display-cli"
+version = "0.1.0"
+edition = "2021"
+description = "CLI tool to generate LaTeX/RST bitfield diagrams from Rust source files"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+syn = { version = "2", features = ["full", "parsing"] }
+clap = { version = "4", features = ["derive"] }
+anyhow = "1"
+
+[dev-dependencies]
+insta = "1"

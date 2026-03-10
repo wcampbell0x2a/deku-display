@@ -1,0 +1,24 @@
+---
+source: deku-display-cli/tests/snapshots.rs
+expression: "generate_all(source, \"rst\")"
+snapshot_kind: text
+---
+.. bitfield::
+    :bits: 8
+    :lanes: 1
+    :hflip:
+    :vflip:
+
+    [
+        { "name": "seq", "bits": 8 }
+    ]
+
+.. bitfield::
+    :bits: 8
+    :lanes: 1
+    :hflip:
+    :vflip:
+
+    [
+        { "name": "seq", "bits": 8 }
+    ]

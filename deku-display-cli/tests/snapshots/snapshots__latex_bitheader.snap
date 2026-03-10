@@ -1,0 +1,13 @@
+---
+source: deku-display-cli/tests/snapshots.rs
+expression: "generate_all(source, \"latex\")"
+snapshot_kind: text
+---
+\begin{figure}
+\begin{bytefield}{8}
+\bitheader{0, 7} \\
+\bitbox{4}{a} & \bitbox{4}{b} \\
+\bitbox{8}{c} \\
+\end{bytefield}
+\caption{Testing}
+\end{figure}

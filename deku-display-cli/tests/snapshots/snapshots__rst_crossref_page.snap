@@ -1,0 +1,97 @@
+---
+source: deku-display-cli/tests/snapshots.rs
+expression: generate_rst_page(source)
+snapshot_kind: text
+---
+Protocol Types
+==============
+
+.. contents::
+    :local:
+
+.. _Header:
+
+Header
+------
+
+.. bitfield::
+    :bits: 8
+    :lanes: 1
+    :hflip:
+    :vflip:
+
+    [
+        { "name": "version", "bits": 4 },
+        { "name": "flags", "bits": 4 }
+    ]
+
+.. _Packet:
+
+Packet
+------
+
+.. bitfield::
+    :bits: 16
+    :lanes: 1
+    :hflip:
+    :vflip:
+
+    [
+        { "name": "header", "bits": 8 },
+        { "name": "payload", "bits": 8 }
+    ]
+
+**Cross-references:** header: :ref:`Header`
+
+.. _Frame:
+
+Frame
+-----
+
+.. list-table:: Variant IDs
+    :header-rows: 1
+
+    * - ID
+      - Variant
+    * - ``—``
+      - Control
+    * - ``—``
+      - Data
+
+
+.. _Frame-Control:
+
+Frame::Control
+~~~~~~~~~~~~~~
+
+.. bitfield::
+    :bits: 16
+    :lanes: 1
+    :hflip:
+    :vflip:
+
+    [
+        { "name": "header", "bits": 8 },
+        { "name": "cmd", "bits": 8 }
+    ]
+
+**Cross-references:** header: :ref:`Header`
+
+
+.. _Frame-Data:
+
+Frame::Data
+~~~~~~~~~~~
+
+.. bitfield::
+    :bits: 16
+    :lanes: 1
+    :hflip:
+    :vflip:
+
+    [
+        { "name": "header", "bits": 8 },
+        { "name": "len", "bits": 8 }
+    ]
+
+**Cross-references:** header: :ref:`Header`

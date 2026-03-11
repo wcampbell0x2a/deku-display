@@ -1,11 +1,12 @@
 use no_std_io::io::Cursor;
 
 use deku::{prelude::*, reader::Reader};
+use deku_display::{DekuDisplay, DekuDisplayOutput};
 use hexlit::hex;
 
 const THREE: u8 = 3;
 
-#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[derive(Debug, PartialEq, DekuRead, DekuWrite, DekuDisplay)]
 #[deku(id_type = "u8")]
 enum InnerEnum {
     #[deku(id = 0)]
@@ -40,7 +41,6 @@ enum DekuEnum {
 
     #[deku(id = 7)]
     Var7 {
-        #[deku_display(bits = "8")]
         inner: InnerEnum,
     },
 }

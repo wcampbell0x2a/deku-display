@@ -328,3 +328,75 @@ fn rst_use_bits_from_type() {
     ]"#;
     assert_eq!(Testing::rst_bitfield_output(), expected);
 }
+
+#[test]
+fn infer_bit_width_from_id_type() {
+    use deku_display::prelude::*;
+
+    #[allow(dead_code)]
+    #[derive(DekuDisplay)]
+    #[deku(id_type = "u8")]
+    enum TestEnum {
+        #[deku(id = 0)]
+        Var1 { field_a: u8 },
+    }
+
+    assert_eq!(TestEnum::BITS, 8);
+
+    let expected = r#"\begin{figure}
+\begin{bytefield}{8}
+\bitheader{0-7} \\
+\bitbox{8}{field\_a} \\
+\end{bytefield}
+\caption{TestEnum::Var1}
+\end{figure}"#;
+    assert_eq!(TestEnum::latex_output(), expected);
+}
+
+#[test]
+fn infer_bit_width_from_bytes() {
+    use deku_display::prelude::*;
+
+    #[allow(dead_code)]
+    #[derive(DekuDisplay)]
+    #[deku(bytes = "2")]
+    struct Testing {
+        a: u8,
+        b: u8,
+    }
+
+    assert_eq!(Testing::BITS, 16);
+
+    let expected = r#"\begin{figure}
+\begin{bytefield}{16}
+\bitheader{0-15} \\
+\bitbox{8}{a} & \bitbox{8}{b} \\
+\end{bytefield}
+\caption{Testing}
+\end{figure}"#;
+    assert_eq!(Testing::latex_output(), expected);
+}
+
+#[test]
+fn field_bytes_attribute() {
+    use deku_display::prelude::*;
+
+    #[allow(dead_code)]
+    #[derive(DekuDisplay)]
+    #[deku_display(bit_width = "32")]
+    struct Testing {
+        a: u8,
+        #[deku(bytes = "2")]
+        b: u32,
+        c: u8,
+    }
+
+    let expected = r#"\begin{figure}
+\begin{bytefield}{32}
+\bitheader{0-31} \\
+\bitbox{8}{a} & \bitbox{16}{b} & \bitbox{8}{c} \\
+\end{bytefield}
+\caption{Testing}
+\end{figure}"#;
+    assert_eq!(Testing::latex_output(), expected);
+}

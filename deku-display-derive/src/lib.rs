@@ -15,7 +15,7 @@ pub fn proc_deku_display(input: proc_macro::TokenStream) -> proc_macro::TokenStr
 }
 
 #[derive(Debug, FromDeriveInput)]
-#[darling(attributes(deku_display), supports(struct_any, enum_any))]
+#[darling(attributes(deku_display, deku), supports(struct_any, enum_any))]
 #[allow(unused)]
 struct DekuDisplayReceiver {
     vis: syn::Visibility,
@@ -23,13 +23,58 @@ struct DekuDisplayReceiver {
     generics: syn::Generics,
     data: ast::Data<DekuDisplayVariantReceiver, DekuDisplayFieldReceiver>,
 
-    bit_width: Num,
+    #[darling(default)]
+    bit_width: Option<Num>,
 
     #[darling(default)]
     bitheader: Option<syn::LitStr>,
+
+    // deku attributes for inference
+    #[darling(default)]
+    id_type: Option<syn::LitStr>,
+
+    #[darling(default, rename = "type")]
+    deku_type: Option<syn::LitStr>,
+
+    #[darling(default)]
+    bits: Option<Num>,
+
+    #[darling(default)]
+    bytes: Option<Num>,
 }
 
 impl DekuDisplayReceiver {
+    fn resolve_bit_width(&self) -> Result<u8, syn::Error> {
+        // Priority: explicit bit_width > bits > bytes*8 > id_type/type inference
+        if let Some(ref bw) = self.bit_width {
+            return bw.0.base10_parse::<u8>();
+        }
+        if let Some(ref bits) = self.bits {
+            return bits.0.base10_parse::<u8>();
+        }
+        if let Some(ref bytes) = self.bytes {
+            let b = bytes.0.base10_parse::<u8>()?;
+            return Ok(b * 8);
+        }
+        // Infer from id_type or type
+        let type_str = self.id_type.as_ref().or(self.deku_type.as_ref());
+        if let Some(t) = type_str {
+            match t.value().as_str() {
+                "u8" | "i8" => return Ok(8),
+                "u16" | "i16" => return Ok(16),
+                "u32" | "i32" => return Ok(32),
+                "u64" | "i64" => return Ok(64),
+                "u128" | "i128" => return Ok(128),
+                _ => {}
+            }
+        }
+        Err(syn::Error::new(
+            self.ident.span(),
+            "bit_width must be specified via #[deku_display(bit_width = N)], \
+             or inferable from #[deku(bits/bytes/id_type/type)]",
+        ))
+    }
+
     fn emit(&self) -> Result<TokenStream, syn::Error> {
         match self.data {
             darling::ast::Data::Enum(_) => self.emit_enum(),
@@ -45,8 +90,7 @@ impl DekuDisplayReceiver {
 
         let fields = self.data.as_ref().take_struct().unwrap();
 
-        // parse required bit_with
-        let bit_width = self.bit_width.0.base10_parse::<u8>()?;
+        let bit_width = self.resolve_bit_width()?;
 
         // either use 0-bitwidth - 1, or user defined string
         let bitheader = if let Some(bitheader) = self.bitheader.as_ref() {
@@ -97,6 +141,13 @@ impl DekuDisplayReceiver {
             let field_ty = &field.ty;
             let token_bits = if let Some(ref bits) = field.bits {
                 if let Ok(bits) = bits.0.base10_parse::<u8>() {
+                    quote! { #bits }
+                } else {
+                    unreachable!()
+                }
+            } else if let Some(ref bytes) = field.bytes {
+                if let Ok(bytes) = bytes.0.base10_parse::<u8>() {
+                    let bits = bytes * 8;
                     quote! { #bits }
                 } else {
                     unreachable!()
@@ -186,7 +237,7 @@ impl DekuDisplayReceiver {
 
         let variants = self.data.as_ref().take_enum().unwrap();
 
-        let bit_width = self.bit_width.0.base10_parse::<u8>()?;
+        let bit_width = self.resolve_bit_width()?;
 
         let bitheader = if let Some(bitheader) = self.bitheader.as_ref() {
             bitheader.value()
@@ -228,6 +279,13 @@ impl DekuDisplayReceiver {
                 let field_ty = &field.ty;
                 let token_bits = if let Some(ref bits) = field.bits {
                     if let Ok(bits) = bits.0.base10_parse::<u8>() {
+                        quote! { #bits }
+                    } else {
+                        unreachable!()
+                    }
+                } else if let Some(ref bytes) = field.bytes {
+                    if let Ok(bytes) = bytes.0.base10_parse::<u8>() {
+                        let bits = bytes * 8;
                         quote! { #bits }
                     } else {
                         unreachable!()
@@ -280,6 +338,13 @@ impl DekuDisplayReceiver {
                 let field_ty = &field.ty;
                 let token_bits = if let Some(ref bits) = field.bits {
                     if let Ok(bits) = bits.0.base10_parse::<u8>() {
+                        quote! { #bits }
+                    } else {
+                        unreachable!()
+                    }
+                } else if let Some(ref bytes) = field.bytes {
+                    if let Ok(bytes) = bytes.0.base10_parse::<u8>() {
+                        let bits = bytes * 8;
                         quote! { #bits }
                     } else {
                         unreachable!()
@@ -357,6 +422,12 @@ struct DekuDisplayVariantReceiver {
     ident: syn::Ident,
     fields: ast::Fields<DekuDisplayFieldReceiver>,
     discriminant: Option<syn::Expr>,
+
+    #[darling(default)]
+    id: darling::util::Ignored,
+
+    #[darling(default)]
+    id_pat: darling::util::Ignored,
 }
 
 /// Receiver for the field-level attributes inside a struct/enum variant
@@ -369,6 +440,10 @@ struct DekuDisplayFieldReceiver {
     /// field bit size
     #[darling(default)]
     bits: Option<Num>,
+
+    /// field byte size (converted to bits by multiplying by 8)
+    #[darling(default)]
+    bytes: Option<Num>,
 
     /// Use lightgray background color and suppress field name
     #[darling(default)]

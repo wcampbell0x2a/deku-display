@@ -1,0 +1,12 @@
+---
+source: tests/test.rs
+expression: "Testing::latex_output()"
+snapshot_kind: text
+---
+\begin{figure}
+\begin{bytefield}{32}
+\bitheader{0-31} \\
+\bitbox{8}{a} & \bitbox{16}{b} & \bitbox{8}{c} \\
+\end{bytefield}
+\caption{Testing}
+\end{figure}

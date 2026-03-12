@@ -224,7 +224,7 @@ struct Bar {
 "#;
     let types = parse::parse_file(source).unwrap();
     assert_eq!(types.len(), 1);
-    assert_eq!(types[0].name(), "Bar");
+    insta::assert_snapshot!(types[0].name(), @"Bar");
 }
 
 #[test]
@@ -237,7 +237,7 @@ struct Bad {
 "#;
     let types = parse::parse_file(source).unwrap();
     let err = generate_latex::generate(&types[0]).unwrap_err();
-    assert!(err.to_string().contains("MyCustomType"));
+    insta::assert_snapshot!(err.to_string());
 }
 
 #[test]

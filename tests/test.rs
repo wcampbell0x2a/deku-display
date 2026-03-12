@@ -14,15 +14,7 @@ fn all_bits() {
         c: u8,
     }
 
-    let expected = r#"\begin{figure}
-\begin{bytefield}{8}
-\bitheader{0-7} \\
-\bitbox{4}{a} & \bitbox{4}{b} \\
-\bitbox{8}{c} \\
-\end{bytefield}
-\caption{Testing}
-\end{figure}"#;
-    assert_eq!(Testing::latex_output(), expected);
+    insta::assert_snapshot!(Testing::latex_output());
 }
 
 #[test]
@@ -40,15 +32,7 @@ fn use_bits_from_type() {
         c: u8,
     }
 
-    let expected = r#"\begin{figure}
-\begin{bytefield}{8}
-\bitheader{0-7} \\
-\bitbox{4}{a} & \bitbox{4}{b} \\
-\bitbox{8}{c} \\
-\end{bytefield}
-\caption{Testing}
-\end{figure}"#;
-    assert_eq!(Testing::latex_output(), expected);
+    insta::assert_snapshot!(Testing::latex_output());
 }
 
 #[test]
@@ -74,17 +58,7 @@ fn readme() {
         dst: u32,
     }
 
-    let expected = r#"\begin{figure}
-\begin{bytefield}{32}
-\bitheader{0-31} \\
-\bitbox{4}{version} & \bitbox{6}{ds} & \bitbox{2}{ecn} & \bitbox{20}{label} \\
-\bitbox{16}{length} & \bitbox{8}{next\_header} & \bitbox{8}{hop\_limit} \\
-\bitbox{32}{src} \\
-\bitbox{32}{dst} \\
-\end{bytefield}
-\caption{Ipv6}
-\end{figure}"#;
-    assert_eq!(Ipv6::latex_output(), expected);
+    insta::assert_snapshot!(Ipv6::latex_output());
 }
 
 #[test]
@@ -103,15 +77,7 @@ fn bitheader() {
         c: u8,
     }
 
-    let expected = r#"\begin{figure}
-\begin{bytefield}{8}
-\bitheader{0, 7} \\
-\bitbox{4}{a} & \bitbox{4}{b} \\
-\bitbox{8}{c} \\
-\end{bytefield}
-\caption{Testing}
-\end{figure}"#;
-    assert_eq!(Testing::latex_output(), expected);
+    insta::assert_snapshot!(Testing::latex_output());
 }
 
 #[test]
@@ -131,15 +97,7 @@ fn unused() {
         c: u8,
     }
 
-    let expected = r#"\begin{figure}
-\begin{bytefield}{8}
-\bitheader{0, 7} \\
-\bitbox{4}{a} & \bitbox{4}[bgcolor=lightgray]{} \\
-\bitbox{8}{c} \\
-\end{bytefield}
-\caption{Testing}
-\end{figure}"#;
-    assert_eq!(Testing::latex_output(), expected);
+    insta::assert_snapshot!(Testing::latex_output());
 }
 
 #[test]
@@ -173,27 +131,10 @@ fn other_struct() {
         dst: u32,
     }
 
-    let expected = r#"\begin{figure}
-\begin{bytefield}{4}
-\bitheader{0-3} \\
-\bitbox{4}{version} \\
-\end{bytefield}
-\caption{Version}
-\end{figure}\begin{figure}
-\begin{bytefield}{32}
-\bitheader{0-31} \\
-\bitbox{4}{v} & \bitbox{6}{ds} & \bitbox{2}{ecn} & \bitbox{20}{label} \\
-\bitbox{16}{length} & \bitbox{8}{next\_header} & \bitbox{8}{hop\_limit} \\
-\bitbox{32}{src} \\
-\bitbox{32}{dst} \\
-\end{bytefield}
-\caption{Ipv6}
-\end{figure}"#;
-
     let mut file = String::new();
     file.push_str(&Version::latex_output());
     file.push_str(&Ipv6::latex_output());
-    assert_eq!(expected, expected);
+    insta::assert_snapshot!(file);
 }
 
 #[test]
@@ -212,18 +153,7 @@ fn rst_all_bits() {
         c: u8,
     }
 
-    let expected = r#".. bitfield::
-    :bits: 16
-    :lanes: 2
-    :hflip:
-    :vflip:
-
-    [
-        { "name": "a", "bits": 4 },
-        { "name": "b", "bits": 4 },
-        { "name": "c", "bits": 8 }
-    ]"#;
-    assert_eq!(Testing::rst_bitfield_output(), expected);
+    insta::assert_snapshot!(Testing::rst_bitfield_output());
 }
 
 #[test]
@@ -249,24 +179,7 @@ fn rst_readme() {
         dst: u32,
     }
 
-    let expected = r#".. bitfield::
-    :bits: 128
-    :lanes: 4
-    :hflip:
-    :vflip:
-
-    [
-        { "name": "version", "bits": 4 },
-        { "name": "ds", "bits": 6 },
-        { "name": "ecn", "bits": 2 },
-        { "name": "label", "bits": 20 },
-        { "name": "length", "bits": 16 },
-        { "name": "next_header", "bits": 8 },
-        { "name": "hop_limit", "bits": 8 },
-        { "name": "src", "bits": 32 },
-        { "name": "dst", "bits": 32 }
-    ]"#;
-    assert_eq!(Ipv6::rst_bitfield_output(), expected);
+    insta::assert_snapshot!(Ipv6::rst_bitfield_output());
 }
 
 #[test]
@@ -286,18 +199,7 @@ fn rst_unused() {
         c: u8,
     }
 
-    let expected = r#".. bitfield::
-    :bits: 16
-    :lanes: 2
-    :hflip:
-    :vflip:
-
-    [
-        { "name": "a", "bits": 4 },
-        { "bits": 4 },
-        { "name": "c", "bits": 8 }
-    ]"#;
-    assert_eq!(Testing::rst_bitfield_output(), expected);
+    insta::assert_snapshot!(Testing::rst_bitfield_output());
 }
 
 #[test]
@@ -315,18 +217,7 @@ fn rst_use_bits_from_type() {
         c: u8,
     }
 
-    let expected = r#".. bitfield::
-    :bits: 16
-    :lanes: 2
-    :hflip:
-    :vflip:
-
-    [
-        { "name": "a", "bits": 4 },
-        { "name": "b", "bits": 4 },
-        { "name": "c", "bits": 8 }
-    ]"#;
-    assert_eq!(Testing::rst_bitfield_output(), expected);
+    insta::assert_snapshot!(Testing::rst_bitfield_output());
 }
 
 #[test]
@@ -343,14 +234,7 @@ fn infer_bit_width_from_id_type() {
 
     assert_eq!(TestEnum::BITS, 8);
 
-    let expected = r#"\begin{figure}
-\begin{bytefield}{8}
-\bitheader{0-7} \\
-\bitbox{8}{field\_a} \\
-\end{bytefield}
-\caption{TestEnum::Var1}
-\end{figure}"#;
-    assert_eq!(TestEnum::latex_output(), expected);
+    insta::assert_snapshot!(TestEnum::latex_output());
 }
 
 #[test]
@@ -367,14 +251,7 @@ fn infer_bit_width_from_bytes() {
 
     assert_eq!(Testing::BITS, 16);
 
-    let expected = r#"\begin{figure}
-\begin{bytefield}{16}
-\bitheader{0-15} \\
-\bitbox{8}{a} & \bitbox{8}{b} \\
-\end{bytefield}
-\caption{Testing}
-\end{figure}"#;
-    assert_eq!(Testing::latex_output(), expected);
+    insta::assert_snapshot!(Testing::latex_output());
 }
 
 #[test]
@@ -391,12 +268,5 @@ fn field_bytes_attribute() {
         c: u8,
     }
 
-    let expected = r#"\begin{figure}
-\begin{bytefield}{32}
-\bitheader{0-31} \\
-\bitbox{8}{a} & \bitbox{16}{b} & \bitbox{8}{c} \\
-\end{bytefield}
-\caption{Testing}
-\end{figure}"#;
-    assert_eq!(Testing::latex_output(), expected);
+    insta::assert_snapshot!(Testing::latex_output());
 }

@@ -1,0 +1,22 @@
+---
+source: tests/test.rs
+expression: "Ipv6::rst_bitfield_output()"
+snapshot_kind: text
+---
+.. bitfield::
+    :bits: 128
+    :lanes: 4
+    :hflip:
+    :vflip:
+
+    [
+        { "name": "version", "bits": 4 },
+        { "name": "ds", "bits": 6 },
+        { "name": "ecn", "bits": 2 },
+        { "name": "label", "bits": 20 },
+        { "name": "length", "bits": 16 },
+        { "name": "next_header", "bits": 8 },
+        { "name": "hop_limit", "bits": 8 },
+        { "name": "src", "bits": 32 },
+        { "name": "dst", "bits": 32 }
+    ]

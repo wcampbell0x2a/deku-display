@@ -1,0 +1,21 @@
+---
+source: tests/test.rs
+expression: file
+snapshot_kind: text
+---
+\begin{figure}
+\begin{bytefield}{4}
+\bitheader{0-3} \\
+\bitbox{4}{version} \\
+\end{bytefield}
+\caption{Version}
+\end{figure}\begin{figure}
+\begin{bytefield}{32}
+\bitheader{0-31} \\
+\bitbox{4}{v} & \bitbox{6}{ds} & \bitbox{2}{ecn} & \bitbox{20}{label} \\
+\bitbox{16}{length} & \bitbox{8}{next\_header} & \bitbox{8}{hop\_limit} \\
+\bitbox{32}{src} \\
+\bitbox{32}{dst} \\
+\end{bytefield}
+\caption{Ipv6}
+\end{figure}

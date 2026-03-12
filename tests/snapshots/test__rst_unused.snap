@@ -1,0 +1,16 @@
+---
+source: tests/test.rs
+expression: "Testing::rst_bitfield_output()"
+snapshot_kind: text
+---
+.. bitfield::
+    :bits: 16
+    :lanes: 2
+    :hflip:
+    :vflip:
+
+    [
+        { "name": "a", "bits": 4 },
+        { "bits": 4 },
+        { "name": "c", "bits": 8 }
+    ]

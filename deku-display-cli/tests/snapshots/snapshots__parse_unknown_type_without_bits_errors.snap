@@ -1,0 +1,6 @@
+---
+source: deku-display-cli/tests/snapshots.rs
+expression: err.to_string()
+snapshot_kind: text
+---
+field 'x' has type 'MyCustomType' with no explicit #[deku(bits = "N")] — cannot infer bit width for non-primitive types

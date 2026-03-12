@@ -1,0 +1,12 @@
+---
+source: tests/test.rs
+expression: "TestEnum::latex_output()"
+snapshot_kind: text
+---
+\begin{figure}
+\begin{bytefield}{8}
+\bitheader{0-7} \\
+\bitbox{8}{field\_a} \\
+\end{bytefield}
+\caption{TestEnum::Var1}
+\end{figure}

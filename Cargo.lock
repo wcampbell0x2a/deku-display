@@ -227,6 +227,7 @@ dependencies = [
  "darling 0.20.8",
  "deku 0.17.0",
  "deku_display_derive",
+ "insta",
 ]
 
 [[package]]

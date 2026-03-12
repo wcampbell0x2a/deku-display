@@ -96,8 +96,7 @@ pub fn generate_page(types: &[TypeInfo]) -> Result<String> {
                     output.push_str(&format!("\n.. _{}:\n\n", anchor));
                     output.push_str(&format!("{}\n{}\n\n", heading, sub_underline));
 
-                    output
-                        .push_str(&generate_bitfield(&fields, e.bit_width as usize)?);
+                    output.push_str(&generate_bitfield(&fields, e.bit_width as usize)?);
                     output.push('\n');
 
                     let crossrefs = collect_crossrefs(&fields, &type_names);

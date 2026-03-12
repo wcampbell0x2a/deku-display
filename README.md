@@ -14,6 +14,10 @@ See `deku_display::attribute` for Attribute details and examples.
 
 # example
 
+## reStructuredText
+Run `$ cargo run` to generate `.rst` output compatible with [sphinxcontrib-bitfield](https://pypi.org/project/sphinxcontrib-bitfield/) for use in Sphinx documentation.
+
+## LaTeX
 Run `$ cargo run && pdflatex sample.tex` to create the following illustration from code:
 
 ```rust

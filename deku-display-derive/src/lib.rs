@@ -272,7 +272,12 @@ impl DekuDisplayReceiver {
                 } else {
                     (
                         "",
-                        field.ident.as_ref().unwrap().to_string().replace('_', "\\_"),
+                        field
+                            .ident
+                            .as_ref()
+                            .unwrap()
+                            .to_string()
+                            .replace('_', "\\_"),
                     )
                 };
 

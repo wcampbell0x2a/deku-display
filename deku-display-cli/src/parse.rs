@@ -185,18 +185,6 @@ fn infer_bit_width(fields: &[FieldInfo]) -> Option<u8> {
     if total == 0 {
         return None;
     }
-    // Prefer the largest width that evenly divides the total
-    for &w in &[32u8, 16, 8] {
-        if total % (w as u32) == 0 {
-            return Some(w);
-        }
-    }
-    // If nothing divides evenly, pick the smallest that fits
-    for &w in &[8u8, 16, 32, 64, 128] {
-        if total <= w as u32 {
-            return Some(w);
-        }
-    }
     Some(32)
 }
 
@@ -227,7 +215,13 @@ fn try_parse_struct(item: &syn::ItemStruct) -> Result<Option<StructInfo>> {
         _ => return Ok(None),
     };
 
-    let bit_width = match infer_bit_width(&fields) {
+    // Filter to only fields whose bit width we can resolve (drops Vec<T>, etc.)
+    let resolvable_fields: Vec<FieldInfo> = fields
+        .into_iter()
+        .filter(|f| f.resolved_bits().is_ok())
+        .collect();
+
+    let bit_width = match infer_bit_width(&resolvable_fields) {
         Some(w) => w,
         None => return Ok(None),
     };
@@ -236,7 +230,7 @@ fn try_parse_struct(item: &syn::ItemStruct) -> Result<Option<StructInfo>> {
         name: item.ident.to_string(),
         bit_width,
         bitheader: None,
-        fields,
+        fields: resolvable_fields,
     }))
 }
 
@@ -255,7 +249,15 @@ fn try_parse_enum(item: &syn::ItemEnum) -> Result<Option<EnumInfo>> {
     let mut variants = Vec::new();
     for variant in &item.variants {
         let fields = parse_variant_fields(&variant.fields)?;
-        let (id_value, id_pat) = parse_variant_deku_attrs(&variant.attrs)?;
+        let (mut id_value, id_pat) = parse_variant_deku_attrs(&variant.attrs)?;
+
+        // Fall back to the Rust discriminant expression (e.g. `Variant = 1`)
+        if id_value.is_none() && id_pat.is_none() {
+            if let Some((_, ref expr)) = variant.discriminant {
+                id_value = Some(expr_to_string(expr));
+            }
+        }
+
         variants.push(VariantInfo {
             name: variant.ident.to_string(),
             id_value,
@@ -393,7 +395,10 @@ fn parse_num_lit(lit: &Lit) -> syn::parse::Result<u8> {
         Lit::Int(int_lit) => int_lit.base10_parse::<u8>(),
         Lit::Str(str_lit) => {
             let val: u8 = str_lit.value().parse().map_err(|_| {
-                syn::Error::new(str_lit.span(), format!("invalid integer: {}", str_lit.value()))
+                syn::Error::new(
+                    str_lit.span(),
+                    format!("invalid integer: {}", str_lit.value()),
+                )
             })?;
             Ok(val)
         }
@@ -436,16 +441,22 @@ fn type_to_bits(ty: &str) -> Option<u8> {
     }
 }
 
-fn infer_bit_width_from_total(total: u32) -> u8 {
-    for &w in &[32u8, 16, 8] {
-        if total % (w as u32) == 0 {
-            return w;
+/// Convert a syn::Expr to a simple string representation for discriminant values.
+fn expr_to_string(expr: &syn::Expr) -> String {
+    match expr {
+        syn::Expr::Lit(lit) => lit_to_string(&lit.lit),
+        syn::Expr::Unary(unary) => {
+            let inner = expr_to_string(&unary.expr);
+            match unary.op {
+                syn::UnOp::Neg(_) => format!("-{inner}"),
+                syn::UnOp::Not(_) => format!("!{inner}"),
+                _ => inner,
+            }
         }
+        _ => "?".to_string(),
     }
-    for &w in &[8u8, 16, 32, 64, 128] {
-        if total <= w as u32 {
-            return w;
-        }
-    }
+}
+
+fn infer_bit_width_from_total(_total: u32) -> u8 {
     32
 }

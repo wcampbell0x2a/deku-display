@@ -14,7 +14,7 @@ struct Cli {
     input: Vec<PathBuf>,
 
     /// Output format
-    #[arg(long, default_value = "latex", value_parser = ["latex", "rst"])]
+    #[arg(long, default_value = "rst", value_parser = ["latex", "rst"])]
     format: String,
 
     /// Output file (default: stdout)

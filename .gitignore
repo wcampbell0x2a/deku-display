@@ -1,3 +1,4 @@
 /target
 bintex-derive/target
-docs/_build/
+/book/book
+/book/src/examples

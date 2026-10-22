@@ -42,4 +42,4 @@ struct Ipv6 {
     dst: u32,
 }
 ```
-![Result](/media/ipv6.png)
+![Result](book/src/images/ipv6.png)

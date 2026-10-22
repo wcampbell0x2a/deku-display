@@ -1,0 +1,14 @@
+:root {
+    --content-max-width: 1400px;
+}
+
+.content img {
+    max-width: 100%;
+}
+
+/* The bitfield diagrams have black lines, thus they need a light background in the dark themes */
+.content img[src$=".svg"] {
+    background: white;
+    padding: 8px;
+    border-radius: 4px;
+}

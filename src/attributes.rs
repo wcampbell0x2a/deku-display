@@ -73,7 +73,7 @@ struct UnusedStruct {
 }
 ```
 
-[example output](https://github.com/wcampbell0x2a/deku-display/blob/master/media/unused.png)
+[example output](https://github.com/wcampbell0x2a/deku-display/blob/master/book/src/images/unused.png)
 
 # bit_width
 

@@ -4,27 +4,24 @@
 [<img alt="docs.rs" src="https://img.shields.io/badge/docs.rs-deku--display-66c2a5?style=for-the-badge&labelColor=555555&logo=docs.rs" height="20">](https://docs.rs/deku-display)
 [<img alt="build status" src="https://img.shields.io/github/actions/workflow/status/wcampbell0x2a/deku-display/main.yml?branch=master&style=for-the-badge" height="20">](https://github.com/wcampbell0x2a/deku-display/actions?query=branch%3Amaster)
 
-Create LaTeX [bytefield](https://www.ctan.org/pkg/bytefield) and reStructuredText [sphinxcontrib-bitfield](https://pypi.org/project/sphinxcontrib-bitfield/) diagrams with the
-use of rust proc-macros and the [deku](https://github.com/sharksforarms/deku) library.
+Create LaTeX [bytefield](https://www.ctan.org/pkg/bytefield) and reStructuredText [sphinxcontrib-bitfield](https://pypi.org/project/sphinxcontrib-bitfield/) diagrams from the Rust types of the [deku](https://github.com/sharksforarms/deku) library.
 
-# docs
-run `$ cargo doc --open`
+* **Derive**: Add `#[derive(DekuDisplay)]` to a type, and get its LaTeX or reStructuredText diagram.
+* **CLI**: Run `deku-display-cli` on your source files. You do not change the code.
+* See the [book](https://wcampbell0x2a.github.io/deku-display/) for usage, every attribute, and example diagrams.
 
-See `deku_display::attribute` for Attribute details and examples.
+## Installation
+```console
+$ cargo add deku-display
+$ cargo install --locked --git https://github.com/wcampbell0x2a/deku-display deku-display-cli
+```
 
-# example
-
-## reStructuredText
-Run `$ cargo run` to generate `.rst` output compatible with [sphinxcontrib-bitfield](https://pypi.org/project/sphinxcontrib-bitfield/) for use in Sphinx documentation.
-
-## LaTeX
-Run `$ cargo run && pdflatex sample.tex` to create the following illustration from code:
-
+## Example
 ```rust
-use deku_display::{DekuDisplay, DekuDisplayOutput};
 use deku::prelude::*;
+use deku_display::prelude::*;
 
-#[derive(DekuDisplay)]
+#[derive(DekuDisplay, DekuRead, DekuWrite)]
 #[deku_display(bit_width = 32)]
 struct Ipv6 {
     #[deku(bits = "4")]
@@ -42,4 +39,20 @@ struct Ipv6 {
     dst: u32,
 }
 ```
-![Result](book/src/images/ipv6.png)
+
+`Ipv6::latex_output()` gives a bytefield figure, and `pdflatex` makes this:
+
+![The Ipv6 figure from pdflatex](book/src/images/ipv6.png)
+
+Or, without a change to the code:
+```console
+$ deku-display-cli src/*.rs --format rst --output protocol.rst
+```
+
+## Development
+All patches/merge requests are welcome!
+
+```
+just test   # run all the tests
+just book   # build the book
+```
